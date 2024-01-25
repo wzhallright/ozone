@@ -57,7 +57,6 @@ import static org.apache.hadoop.ozone.s3.util.S3Consts.STORAGE_CLASS_HEADER;
 import static org.apache.hadoop.ozone.s3.util.S3Utils.urlEncode;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.mock;
@@ -266,14 +265,14 @@ public class TestS3GatewayMetrics {
     InputStream inputBody = TestBucketAcl.class.getClassLoader()
         .getResourceAsStream("userAccessControlList.xml");
 
-    try {
-      bucketEndpoint.put("unknown_bucket", ACL_MARKER, headers,
-          inputBody);
-      fail();
-    } catch (OS3Exception ex) {
-    } finally {
-      inputBody.close();
-    }
+    assertThrows(OS3Exception.class, () -> {
+      try {
+        bucketEndpoint.put("unknown_bucket", ACL_MARKER, headers,
+            inputBody);
+      } finally {
+        inputBody.close();
+      }
+    });
     long curMetric = metrics.getPutAclFailure();
     assertEquals(1L, curMetric - oriMetric);
   }

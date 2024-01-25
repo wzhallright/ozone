@@ -734,12 +734,7 @@ public class TestStorageContainerManager {
       final String clusterId =
           cluster.getStorageContainerManager().getClusterId();
       // validate there is no ratis group pre existing
-      try {
-        validateRatisGroupExists(conf, clusterId);
-        fail();
-      } catch (IOException ioe) {
-        // Exception is expected here
-      }
+      assertThrows(IOException.class, () -> validateRatisGroupExists(conf, clusterId));
 
       conf.setBoolean(ScmConfigKeys.OZONE_SCM_HA_ENABLE_KEY, true);
       // This will re-initialize SCM

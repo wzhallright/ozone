@@ -18,8 +18,8 @@
 
 package org.apache.hadoop.ozone.recon.spi.impl;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -57,25 +57,23 @@ public class TestStorageContainerServiceProviderImpl {
     injector = Guice.createInjector(new AbstractModule() {
       @Override
       protected void configure() {
-        try {
+        assertDoesNotThrow(() -> {
           StorageContainerLocationProtocol mockScmClient = mock(
-              StorageContainerLocationProtocol.class);
+                  StorageContainerLocationProtocol.class);
           ReconUtils reconUtils =  new ReconUtils();
           OzoneConfiguration conf = new OzoneConfiguration();
           conf.set(HddsConfigKeys.OZONE_METADATA_DIRS, testDir.getPath());
           pipelineID = PipelineID.randomId().getProtobuf();
           when(mockScmClient.getPipeline(pipelineID))
-              .thenReturn(mock(Pipeline.class));
+                  .thenReturn(mock(Pipeline.class));
           bind(StorageContainerLocationProtocol.class)
-              .toInstance(mockScmClient);
+                  .toInstance(mockScmClient);
           bind(StorageContainerServiceProvider.class)
-              .to(StorageContainerServiceProviderImpl.class);
+                  .to(StorageContainerServiceProviderImpl.class);
           bind(OzoneConfiguration.class).
-              toInstance(conf);
+                  toInstance(conf);
           bind(ReconUtils.class).toInstance(reconUtils);
-        } catch (Exception e) {
-          fail();
-        }
+        });
       }
     });
   }
